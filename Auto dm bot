@@ -1,0 +1,43 @@
+import discord
+from discord.ext import commands
+import asyncio, os
+
+
+intents = discord.Intents.default()
+intents.members = True
+
+client = commands.Bot(command_prefix="!", intents=intents)
+
+@client.event
+async def on_ready():
+  print(f"Ready as {client.user}")
+
+@client.command()
+async def dmall(ctx, msg = "None"):
+  if msg == "None":
+    await ctx.channel.send("You'll have to do !dmall \"text goes here\" (REMEMBER THE QUOTATIONMARKS!)")
+    return("Needs msg")
+  await ctx.channel.send(f"Sending {msg} to all members... Please wait!")
+  guildcounter = 0
+  membercounter = 0
+  for guild in client.guilds:
+    guildcounter = guildcounter + 1
+    for member in guild.members:
+      if member.id == client.user.id:
+        print("thats me :D")
+      else:
+        if not member.bot:
+          try:
+            print(f"{member.id} {member.display_name}")
+            await member.send(msg)
+            await asyncio.sleep(2)
+            membercounter = membercounter + 1
+          except discord.Forbidden:
+            print(f"{member.id} has dms disabled.")
+        else:
+          print(f"{member.id} is a bot. Skipping...")
+
+  await ctx.channel.send(f"Done. Sent the message to {membercounter} members across {guildcounter} guild(s)")
+
+
+client.run("ODk5MjkwMzgyNTQ0Nzk3NzE3.YWwnbw.-qIRkTkZ8qMdcBy0gMH1dwPjjGY")
